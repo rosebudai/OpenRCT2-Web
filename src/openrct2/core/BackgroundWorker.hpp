@@ -24,6 +24,12 @@
 
 namespace OpenRCT2
 {
+#if defined(__EMSCRIPTEN__) && !defined(__EMSCRIPTEN_PTHREADS__)
+    constexpr bool kBackgroundWorkerSingleThreaded = true;
+#else
+    constexpr bool kBackgroundWorkerSingleThreaded = false;
+#endif
+
     namespace Detail
     {
         template<typename TFn, typename TWantsToken>
@@ -178,15 +184,18 @@ namespace OpenRCT2
     public:
         BackgroundWorker()
         {
-            const auto threadsAvailable = std::max(std::thread::hardware_concurrency(), 1u);
-
-            // NOTE: We don't want to use all available threads, this is for background work only.
-            // Adjust the number of threads if needed.
-            const auto numThreads = std::min(threadsAvailable, 2u);
-
-            for (auto i = 0u; i < numThreads; ++i)
+            if constexpr (!kBackgroundWorkerSingleThreaded)
             {
-                _workThreads.emplace_back([this] { processJobs(); });
+                const auto threadsAvailable = std::max(std::thread::hardware_concurrency(), 1u);
+
+                // NOTE: We don't want to use all available threads, this is for background work only.
+                // Adjust the number of threads if needed.
+                const auto numThreads = std::min(threadsAvailable, 2u);
+
+                for (auto i = 0u; i < numThreads; ++i)
+                {
+                    _workThreads.emplace_back([this] { processJobs(); });
+                }
             }
         }
 
@@ -242,9 +251,19 @@ namespace OpenRCT2
             {
                 std::lock_guard lock(_mtx);
                 _jobs.push_back(job);
-                _pending.push_back(job);
+                if constexpr (!kBackgroundWorkerSingleThreaded)
+                {
+                    _pending.push_back(job);
+                }
             }
-            _cv.notify_one();
+            if constexpr (kBackgroundWorkerSingleThreaded)
+            {
+                job->run();
+            }
+            else
+            {
+                _cv.notify_one();
+            }
 
             return Job(job);
         }

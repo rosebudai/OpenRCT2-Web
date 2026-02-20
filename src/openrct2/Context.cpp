@@ -1228,6 +1228,13 @@ namespace OpenRCT2
         {
             if (!_versionCheckFuture.valid())
             {
+#if defined(__EMSCRIPTEN__) && !defined(__EMSCRIPTEN_PTHREADS__)
+                _newVersionInfo = GetLatestVersion();
+                if (!String::startsWith(gVersionInfoTag, _newVersionInfo.tag))
+                {
+                    _hasNewVersionInfo = true;
+                }
+#else
                 _versionCheckFuture = std::async(std::launch::async, [this] {
                     _newVersionInfo = GetLatestVersion();
                     if (!String::startsWith(gVersionInfoTag, _newVersionInfo.tag))
@@ -1235,6 +1242,7 @@ namespace OpenRCT2
                         _hasNewVersionInfo = true;
                     }
                 });
+#endif
             }
 
             if (!gOpenRCT2Headless)

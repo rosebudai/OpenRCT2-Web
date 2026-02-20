@@ -11,6 +11,12 @@
 
 #include <cassert>
 
+#if defined(__EMSCRIPTEN__) && !defined(__EMSCRIPTEN_PTHREADS__)
+static constexpr bool kJobPoolSingleThreaded = true;
+#else
+static constexpr bool kJobPoolSingleThreaded = false;
+#endif
+
 JobPool::TaskData::TaskData(std::function<void()> workFn, std::function<void()> completionFn)
     : WorkFn(std::move(workFn))
     , CompletionFn(std::move(completionFn))
@@ -19,6 +25,11 @@ JobPool::TaskData::TaskData(std::function<void()> workFn, std::function<void()> 
 
 JobPool::JobPool(size_t maxThreads)
 {
+    if constexpr (kJobPoolSingleThreaded)
+    {
+        return;
+    }
+
     maxThreads = std::min<size_t>(maxThreads, std::max(1u, std::thread::hardware_concurrency()));
     for (size_t n = 0; n < maxThreads; n++)
     {
@@ -43,6 +54,16 @@ JobPool::~JobPool()
 
 void JobPool::AddTask(std::function<void()> workFn, std::function<void()> completionFn)
 {
+    if constexpr (kJobPoolSingleThreaded)
+    {
+        workFn();
+        if (completionFn)
+        {
+            completionFn();
+        }
+        return;
+    }
+
     {
         std::lock_guard lock(_mutex);
         _pending.emplace_back(workFn, completionFn);

@@ -84,20 +84,26 @@ repack_zip_from_dir() {
     local repacked_zip="$zip_path.repacked"
     local list_file
     list_file="$(mktemp "$workdir/files.XXXXXX")"
+    local dirs_file
+    dirs_file="$(mktemp "$workdir/dirs.XXXXXX")"
+    local merged_file
+    merged_file="$(mktemp "$workdir/merged.XXXXXX")"
 
     (
         cd "$source_dir"
         LC_ALL=C find . -type f | sed 's#^\./##' | sort > "$list_file"
+        LC_ALL=C find . -type d | sed 's#^\./##' | awk '$0 != "." && NF { print $0 "/" }' | sort > "$dirs_file"
         if [[ ! -s "$list_file" ]]; then
             echo "Refusing to create empty archive: $zip_path" >&2
             exit 1
         fi
+        cat "$dirs_file" "$list_file" > "$merged_file"
         rm -f "$repacked_zip"
-        zip -q -X "$repacked_zip" -@ < "$list_file"
+        zip -q -X "$repacked_zip" -@ < "$merged_file"
     )
 
     mv -f "$repacked_zip" "$zip_path"
-    rm -f "$list_file"
+    rm -f "$list_file" "$dirs_file" "$merged_file"
 }
 
 apply_overlay_to_nested_zip() {

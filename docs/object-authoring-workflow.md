@@ -6,7 +6,7 @@ This guide uses scripts in this repo to create editable object workspaces from a
 
 - Input upload zip (example: `/Users/meiliu/Downloads/openrct2-upload.zip`)
 - Docker available (used by `scripts/openrct2-cli-docker.sh`)
-- `build-native/openrct2-cli` built once (the wrapper prints the exact build command if missing)
+- `build_native/openrct2-cli` built once (the wrapper prints the exact build command if missing)
 
 ## 1) Initialize an editable workspace
 

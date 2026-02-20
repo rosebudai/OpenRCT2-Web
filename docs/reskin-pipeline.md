@@ -12,7 +12,7 @@ It is built from these scripts:
 
 - Input upload zip (example: `/Users/meiliu/Downloads/openrct2-upload.zip`)
 - Docker available (for `scripts/openrct2-cli-docker.sh`)
-- `build-native/openrct2-cli` built once
+- `build_native/openrct2-cli` built once
 
 ## 1) Initialize one or more workspaces
 

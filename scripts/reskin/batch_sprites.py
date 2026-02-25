@@ -61,7 +61,7 @@ def create_batches(sprites):
 def render_grid(batch, batch_id):
     """Render a batch as a grid image on a 2048x2048 canvas.
 
-    Returns (canvas_image, draw, batch_metadata, cell_w, cell_h).
+    Returns (canvas_image, batch_metadata_dict).
     """
     bw, bh = batch["bucket"]
     sprites_meta = batch["sprites"]

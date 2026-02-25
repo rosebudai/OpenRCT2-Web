@@ -36,3 +36,4 @@ Handles fal_client import gracefully (set to None if not installed).
 Created scripts/reskin/test_generate_restyled.py with 4 tests — all pass.
 Verification passed: pytest scripts/reskin/test_generate_restyled.py -v (4/4 passed).
 Status: PASSED
+Status: PASSED

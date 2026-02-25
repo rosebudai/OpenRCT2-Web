@@ -41,7 +41,7 @@
       "title": "reskin.py — orchestrator with tests",
       "description": "Create scripts/reskin/reskin.py that chains batch -> generate -> parse. Supports workspace mode (--workspace, reads sprites/ subdir, writes back there) and standalone mode (--sprites-dir). Uses sys.path.insert to import sibling modules. Functions: resolve_dirs(args), resolve_style(args), resolve_tiling(args), resolve_description_hint(args), run_step(step, ...). CLI: --workspace|--sprites-dir, --style, --category, --tiling, --step, --through, --dry-run, --skip-existing, --list-categories. Also create scripts/reskin/test_reskin.py with 6 tests: test_resolve_dirs_workspace, test_resolve_dirs_standalone, test_resolve_style_explicit, test_resolve_style_from_category, test_resolve_tiling_explicit, test_resolve_tiling_from_category. See docs/plans/2026-02-25-reskin-pipeline.md Task 5 for exact code.",
       "verify": "cd /workspace/OpenRCT2-Web && python3 -m pytest scripts/reskin/test_reskin.py -v && python3 scripts/reskin/reskin.py --list-categories",
-      "status": "pending",
+      "status": "passed",
       "retries": 0
     },
     {

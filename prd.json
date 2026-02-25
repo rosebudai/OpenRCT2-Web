@@ -17,7 +17,7 @@
       "title": "batch_sprites.py — grid batching with tests",
       "description": "Create scripts/reskin/batch_sprites.py adapted from /workspace/ottd-reskin-pipeline/batch_env.py. Key changes: no NFO parsing, no sprite ID extraction (use filenames as-is), no subcategory batching. Functions: load_sprites(dir), create_batches(sprites), render_grid_with_sprites(batch, batch_id, sprites_dir), batch_sprites(sprites_dir, batch_dir, style_prompt, description_hint, tiling). Also a main() CLI with --sprites-dir, --batch-dir, --style, --description-hint, --tiling args. Also create scripts/reskin/test_batch_sprites.py with 6 tests: test_load_sprites, test_load_sprites_ignores_non_png, test_create_batches_single_bucket, test_create_batches_splits_at_16, test_create_batches_separates_sizes, test_batch_sprites_end_to_end. See docs/plans/2026-02-25-reskin-pipeline.md Task 2 for exact code.",
       "verify": "cd /workspace/OpenRCT2-Web && python3 -m pytest scripts/reskin/test_batch_sprites.py -v",
-      "status": "pending",
+      "status": "passed",
       "retries": 0
     },
     {

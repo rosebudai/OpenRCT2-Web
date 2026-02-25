@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Orchestrate the OpenRCT2 sprite reskin pipeline.
 
-Chains: batch -> generate -> parse for a sprite directory or workspace.
+Chains: batch -> describe -> generate -> parse for a sprite directory or workspace.
 
 Workspace mode (from init-reskin-object-workspace.sh):
     python3 reskin.py --workspace ./reskin-workbench/my-object --style "fantasy style"
@@ -11,7 +11,7 @@ Standalone mode (any PNG directory):
     python3 reskin.py --sprites-dir ./sprites --style "pixel art" --through generate
     python3 reskin.py --sprites-dir ./sprites --step parse
 
-Steps: batch -> generate -> parse
+Steps: batch -> describe -> generate -> parse
 """
 
 import os
@@ -23,10 +23,11 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from categories import CATEGORIES
 from batch_sprites import batch_sprites
+from describe_grid import describe_all
 from generate_restyled import generate_all
 from parse_restyled import parse_restyled
 
-STEPS = ["batch", "generate", "parse"]
+STEPS = ["batch", "describe", "generate", "parse"]
 
 
 def resolve_dirs(args):
@@ -107,6 +108,21 @@ def run_step(step, sprites_dir, batch_dir, restyled_dir, output_dir, args):
             tiling=tiling if tiling is not None else False,
         )
 
+    elif step == "describe":
+        print("\n--- Describe ---")
+        if not os.path.exists(manifest_path):
+            print(f"ERROR: {manifest_path} not found. Run batch step first.")
+            return False
+
+        descriptions_dir = args.descriptions_dir or os.path.join(
+            os.path.dirname(batch_dir.rstrip("/")), "descriptions"
+        )
+        describe_all(
+            manifest_path=manifest_path,
+            descriptions_dir=descriptions_dir,
+            skip_existing=args.skip_existing,
+        )
+
     elif step == "generate":
         print("\n--- Generate ---")
         if not os.path.exists(manifest_path):
@@ -118,7 +134,9 @@ def run_step(step, sprites_dir, batch_dir, restyled_dir, output_dir, args):
             return False
 
         style = resolve_style(args)
-        descriptions_dir = args.descriptions_dir
+        descriptions_dir = args.descriptions_dir or os.path.join(
+            os.path.dirname(batch_dir.rstrip("/")), "descriptions"
+        )
         generate_all(
             manifest_path=manifest_path,
             restyled_dir=restyled_dir,

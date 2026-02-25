@@ -86,3 +86,11 @@ Created scripts/reskin/test_judge_screenshot.py with 8 tests:
 Verification passed: pytest scripts/reskin/test_judge_screenshot.py -v (8/8 passed).
 Status: PASSED
 Status: PASSED
+
+--- Iteration 8 | story-8 | 2026-02-25 00:21:10 ---
+Full test suite verification and CLI smoke test — all green.
+- 35/35 tests passed across 7 test files (batch_sprites, generate_restyled, judge_screenshot, parse_restyled, reskin, screenshot_game)
+- All 6 CLI scripts respond to --help without errors
+- --list-categories shows 6 categories correctly
+- No fixes needed — all prior stories left clean code.
+Status: PASSED

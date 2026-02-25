@@ -65,7 +65,7 @@
       "title": "Full test suite verification and CLI smoke test",
       "description": "Run the complete test suite across all scripts/reskin/ test files. Verify all 4 CLI scripts print help without errors:\n- python3 scripts/reskin/batch_sprites.py --help\n- python3 scripts/reskin/generate_restyled.py --help\n- python3 scripts/reskin/parse_restyled.py --help\n- python3 scripts/reskin/reskin.py --help\n- python3 scripts/reskin/screenshot_game.py --help\n- python3 scripts/reskin/judge_screenshot.py --help\n- python3 scripts/reskin/reskin.py --list-categories (should list 6 categories)\n\nIf any tests fail, fix them. If any --help fails, fix the argparse setup. This is a cleanup/validation story.",
       "verify": "cd /workspace/OpenRCT2-Web && python3 -m pytest scripts/reskin/ -v && python3 scripts/reskin/reskin.py --list-categories && python3 scripts/reskin/batch_sprites.py --help > /dev/null && python3 scripts/reskin/judge_screenshot.py --help > /dev/null",
-      "status": "pending",
+      "status": "passed",
       "retries": 0
     }
   ]

@@ -94,3 +94,4 @@ Full test suite verification and CLI smoke test — all green.
 - --list-categories shows 6 categories correctly
 - No fixes needed — all prior stories left clean code.
 Status: PASSED
+Status: PASSED

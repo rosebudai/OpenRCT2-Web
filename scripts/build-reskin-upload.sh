@@ -169,8 +169,8 @@ rm -f "$output_zip"
     LC_ALL=C find . -type f | sed 's#^\./##' | sort | zip -q -X "$output_zip" -@
 )
 
-input_bytes="$(stat -f%z "$input_zip")"
-output_bytes="$(stat -f%z "$output_zip")"
+input_bytes="$(stat -c%s "$input_zip" 2>/dev/null || stat -f%z "$input_zip")"
+output_bytes="$(stat -c%s "$output_zip" 2>/dev/null || stat -f%z "$output_zip")"
 delta_bytes="$((input_bytes - output_bytes))"
 
 echo

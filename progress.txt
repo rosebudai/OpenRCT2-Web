@@ -95,3 +95,34 @@ Full test suite verification and CLI smoke test — all green.
 - No fixes needed — all prior stories left clean code.
 Status: PASSED
 Status: PASSED
+
+
+--- FAL.ai Scale-Up Findings | 2026-02-25 ---
+
+Scaled the reskin pipeline to process Electric Fields scenario walls (26 objects, 84 sprites)
+and paths (8 objects, 468 sprites) through FAL.ai Gemini 3 Pro image edit API.
+
+Pipeline execution:
+- 36/36 FAL.ai batches succeeded (6 wall + 30 path)
+- 552/552 sprites parsed and quantized to RCT2 palette
+- 34 parkobj files rebuilt with correct sprite offsets
+- End-to-end: batch → generate → parse → quantize → rebuild → deploy
+
+Key findings:
+1. Sprite offsets (x,y in sprites-full.json) are critical — defaulting to 0,0 causes
+   severe misalignment. Must export via `openrct2-cli sprite exportobject` and parse stdout.
+2. Palette quantization is the primary blocker for AI-generated reskins. The ~176 usable
+   RCT2 palette colors cannot represent neon/cyberpunk effects (cyan, magenta, glow).
+   AI output gets crushed to dark muddy blocks during quantization.
+3. g1.dat modification is risky: sprites >256px must be cropped, but cropping breaks the
+   sprite index alignment causing black/purple checkerboard artifacts in-game.
+4. Mechanical palette remapping (index swap, no AI) works perfectly — proven with purple
+   grass tint across all 29294 g1.dat sprites.
+5. Objects-only deployment (parkobjs without g1.dat changes) is safe and functional.
+
+Recommended next steps:
+- Option A: Palette-aware AI prompts ("use only these specific colors")
+- Option B: Mechanical palette remap only (proven reliable, limited creative range)
+- Option C: Hybrid — AI for shape/detail changes, then palette remap for color
+
+--- COMPLETE: All stories processed ---

@@ -18,3 +18,4 @@ Created scripts/reskin/categories.py with 6 category presets (scenery_small, sce
 Each has tiling (bool), style_prompt (str), description_hint (str). No sprite ID ranges — OpenRCT2 discovers sprites from filesystem.
 Verification passed: import + assert len(CATEGORIES) == 6.
 Status: PASSED
+Status: PASSED

@@ -47,3 +47,13 @@ Created scripts/reskin/test_parse_restyled.py with 7 tests — all pass.
 Verification passed: pytest scripts/reskin/test_parse_restyled.py -v (7/7 passed).
 Status: PASSED
 Status: PASSED
+
+--- Iteration 5 | story-5 | 2026-02-25 00:16:25 ---
+Created scripts/reskin/reskin.py — orchestrator chaining batch -> generate -> parse.
+Supports workspace mode (--workspace) and standalone mode (--sprites-dir).
+Functions: resolve_dirs, resolve_style, resolve_tiling, resolve_description_hint, run_step, main CLI.
+CLI args: --workspace|--sprites-dir, --style, --category, --tiling, --step, --through, --dry-run, --skip-existing, --list-categories.
+Created scripts/reskin/test_reskin.py with 6 tests — all pass.
+Verification passed: pytest scripts/reskin/test_reskin.py -v (6/6 passed) + --list-categories (6 categories).
+Status: PASSED
+Status: PASSED

@@ -28,3 +28,11 @@ Created scripts/reskin/test_batch_sprites.py with 6 tests — all pass.
 Verification passed: pytest scripts/reskin/test_batch_sprites.py -v (6/6 passed).
 Status: PASSED
 Status: PASSED
+
+--- Iteration 3 | story-3 | 2026-02-25 00:12:44 ---
+Created scripts/reskin/generate_restyled.py adapted from ottd-reskin-pipeline/generate_restyled.py.
+Key functions: load_descriptions, build_prompt, generate_with_fal, generate_all, main CLI.
+Handles fal_client import gracefully (set to None if not installed).
+Created scripts/reskin/test_generate_restyled.py with 4 tests — all pass.
+Verification passed: pytest scripts/reskin/test_generate_restyled.py -v (4/4 passed).
+Status: PASSED

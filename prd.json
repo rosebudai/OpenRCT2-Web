@@ -25,7 +25,7 @@
       "title": "generate_restyled.py — FAL.ai generation with tests",
       "description": "Create scripts/reskin/generate_restyled.py adapted from /workspace/ottd-reskin-pipeline/generate_restyled.py. Keep all FAL.ai logic identical. Key functions: load_descriptions(dir, batch_id), build_prompt(batch_meta, style_desc, descriptions_dir), generate_with_fal(prompt, condition_path, output_path, retries), generate_all(manifest_path, restyled_dir, style, descriptions_dir, skip_existing, batch_id_filter). Handle fal_client import gracefully (set to None if not installed). Also create scripts/reskin/test_generate_restyled.py with 4 tests: test_build_prompt_no_descriptions, test_build_prompt_with_descriptions, test_load_descriptions_missing_dir, test_load_descriptions_missing_file. See docs/plans/2026-02-25-reskin-pipeline.md Task 3 for exact code.",
       "verify": "cd /workspace/OpenRCT2-Web && python3 -m pytest scripts/reskin/test_generate_restyled.py -v",
-      "status": "pending",
+      "status": "passed",
       "retries": 0
     },
     {

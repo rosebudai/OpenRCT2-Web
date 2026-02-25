@@ -90,6 +90,82 @@ def restore_alpha(restyled_sprite, original_path):
     return Image.merge("RGBA", (r, g, b, original_alpha))
 
 
+def cleanup_black_artifacts(restyled, original_path, darkness_ratio=0.55):
+    """Replace anomalously dark artifact pixels with colors from bright neighbors.
+
+    AI generation sometimes paints dark bands across sprites (from grid lines
+    bleeding into content). This detects opaque pixels that are much darker
+    than the sprite's median brightness AND where the original was not dark,
+    then fills them from the nearest bright non-artifact neighbor.
+
+    Args:
+        darkness_ratio: A pixel is considered an artifact if its brightness
+            is below this fraction of the sprite's median opaque brightness
+            AND the original pixel was brighter than the median.
+    """
+    original = Image.open(original_path).convert("RGBA")
+    rest_arr = np.array(restyled).copy()
+    orig_arr = np.array(original)
+
+    h, w = rest_arr.shape[:2]
+    rest_rgb = rest_arr[:, :, :3].astype(float)
+    orig_rgb = orig_arr[:, :, :3].astype(float)
+    rest_alpha = rest_arr[:, :, 3]
+
+    opaque = rest_alpha > 128
+    if not opaque.any():
+        return restyled
+
+    # Compute median brightness of opaque pixels in both images
+    rest_bright = rest_rgb.max(axis=2)
+    orig_bright = orig_rgb.max(axis=2)
+    median_rest = float(np.median(rest_bright[opaque]))
+    median_orig = float(np.median(orig_bright[opaque]))
+
+    if median_rest < 30:
+        # Sprite is genuinely dark overall, skip cleanup
+        return restyled
+
+    dark_thresh = median_rest * darkness_ratio
+
+    # Artifact: opaque, much darker than median in restyled,
+    # but original was NOT dark (above half its median)
+    is_artifact = (
+        opaque
+        & (rest_bright < dark_thresh)
+        & (orig_bright > median_orig * 0.4)
+    )
+
+    if not is_artifact.any():
+        return restyled
+
+    count = int(is_artifact.sum())
+
+    # Fill artifacts from nearest non-artifact opaque neighbor
+    ys, xs = np.where(is_artifact)
+    for y, x in zip(ys, xs):
+        best = None
+        for radius in range(1, max(h, w)):
+            for dy in range(-radius, radius + 1):
+                for dx in range(-radius, radius + 1):
+                    if abs(dy) != radius and abs(dx) != radius:
+                        continue
+                    ny, nx = y + dy, x + dx
+                    if 0 <= ny < h and 0 <= nx < w:
+                        if opaque[ny, nx] and not is_artifact[ny, nx]:
+                            best = (ny, nx)
+                            break
+                if best:
+                    break
+            if best:
+                break
+        if best:
+            rest_arr[y, x, :3] = rest_arr[best[0], best[1], :3]
+
+    print(f"    cleaned {count} dark artifact pixels")
+    return Image.fromarray(rest_arr)
+
+
 def blend_tile_edges(restyled, original, edge_pixels=6):
     """Blend outer edge pixels back to original for seamless tiling."""
     res = np.array(restyled).astype(float)
@@ -199,6 +275,9 @@ def parse_restyled(manifest_path, sprites_dir, restyled_dir=None,
 
             # Restore original alpha mask
             sprite_img = restore_alpha(sprite_img, orig_path)
+
+            # Clean up black artifact pixels from AI generation
+            sprite_img = cleanup_black_artifacts(sprite_img, orig_path)
 
             # Blend tile edges
             if use_tiling:

@@ -1,0 +1,20 @@
+# Progress Log — reskin-pipeline
+# Generated from docs/plans/2026-02-25-reskin-pipeline.md
+# Started: 2026-02-25
+
+## Context
+- Adapting /workspace/ottd-reskin-pipeline/ (AI sprite reskinning for OpenTTD) to OpenRCT2
+- OpenRCT2 uses .parkobj files (zip with object.json + images.dat), not GRF/NFO
+- Existing shell scripts handle extraction/repackaging: init-reskin-object-workspace.sh, rebuild-object.sh, build-reskin-upload.sh
+- New Python pipeline slots between extraction and rebuild: batch -> generate (FAL.ai) -> parse
+- Also adding Playwright screenshot and Gemini CLI visual judging capabilities
+- All new files go under scripts/reskin/
+- Python deps available: Pillow, numpy, fal-client
+- Playwright installed with Chromium at /root/.cache/ms-playwright/chromium-1208
+- Gemini CLI available at /usr/local/share/npm-global/bin/gemini
+- Existing workspace example at tmp/reskin-workbench/support-structure-half/ with 4 sprites
+--- Iteration 1 | story-1 | 2026-02-25 00:10:08 ---
+Created scripts/reskin/categories.py with 6 category presets (scenery_small, scenery_large, scenery_wall, terrain, footpath, ride).
+Each has tiling (bool), style_prompt (str), description_hint (str). No sprite ID ranges — OpenRCT2 discovers sprites from filesystem.
+Verification passed: import + assert len(CATEGORIES) == 6.
+Status: PASSED

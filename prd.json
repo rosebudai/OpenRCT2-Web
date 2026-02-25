@@ -49,7 +49,7 @@
       "title": "Playwright screenshot skill for OpenRCT2 web",
       "description": "Create scripts/reskin/screenshot_game.py — a Playwright script that:\n1. Starts the OpenRCT2 web server (scripts/serve-emscripten.py) pointing at a directory containing the built wasm output\n2. Launches headless Chromium with SharedArrayBuffer support (args: --enable-features=SharedArrayBuffer)\n3. Navigates to index.html, waits for the canvas to appear (selector: canvas#canvas with display != none)\n4. Waits for the game to load (the #loadingWebassembly element gets removed when loading completes — wait for it to be detached)\n5. Takes a screenshot and saves to a specified output path\n6. Shuts down browser and server\n\nCLI: python3 screenshot_game.py --serve-dir <dir> --output <path.png> [--port 8000] [--wait-seconds 10]\n\nUse playwright.sync_api (Python sync API). The server needs COOP/COEP headers (serve-emscripten.py handles this).\n\nIMPORTANT: The script must handle the case where no wasm build exists gracefully — print a clear error message and exit 1. Do NOT try to build the wasm.\n\nTest: Create scripts/reskin/test_screenshot_game.py with at least 2 tests:\n- test_server_starts_and_stops: verify the COOP/COEP server can start on a temp dir and respond to requests\n- test_missing_serve_dir: verify graceful error when dir doesn't exist\n\nDo NOT test the full Playwright flow in unit tests (requires wasm build). The integration test is manual.",
       "verify": "cd /workspace/OpenRCT2-Web && python3 -m pytest scripts/reskin/test_screenshot_game.py -v",
-      "status": "pending",
+      "status": "passed",
       "retries": 0
     },
     {

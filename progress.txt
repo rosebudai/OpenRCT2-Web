@@ -57,3 +57,16 @@ Created scripts/reskin/test_reskin.py with 6 tests — all pass.
 Verification passed: pytest scripts/reskin/test_reskin.py -v (6/6 passed) + --list-categories (6 categories).
 Status: PASSED
 Status: PASSED
+
+--- Iteration 6 | story-6 | 2026-02-25 00:18:04 ---
+Created scripts/reskin/screenshot_game.py — Playwright screenshot script for OpenRCT2 web.
+Features: COOP/COEP server (reuses pattern from serve-emscripten.py), headless Chromium with
+SharedArrayBuffer support, waits for canvas#canvas visible + #loadingWebassembly detached,
+graceful error on missing serve dir.
+CLI: --serve-dir, --output, --port, --wait-seconds.
+Created scripts/reskin/test_screenshot_game.py with 2 tests:
+- test_server_starts_and_stops: verifies COOP/COEP headers and content serving
+- test_missing_serve_dir: verifies exit 1 with clear error message
+Note: had to pip install playwright (browsers were pre-installed at /root/.cache/ms-playwright/).
+Verification passed: pytest scripts/reskin/test_screenshot_game.py -v (2/2 passed).
+Status: PASSED

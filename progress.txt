@@ -71,3 +71,17 @@ Note: had to pip install playwright (browsers were pre-installed at /root/.cache
 Verification passed: pytest scripts/reskin/test_screenshot_game.py -v (2/2 passed).
 Status: PASSED
 Status: PASSED
+
+--- Iteration 7 | story-7 | 2026-02-25 00:19:36 ---
+Created scripts/reskin/judge_screenshot.py — Gemini CLI visual judge for game screenshots.
+Features: build_prompt() for single/comparison modes with optional criteria,
+parse_rating() extracts X/10 pattern, invoke_gemini() calls CLI with --include-directories,
+judge() orchestrates prompt+invoke+parse, CLI with positional screenshot arg + --reference + --criteria.
+Exits 0 if rating >= 5, exit 1 if < 5 or unparseable.
+Created scripts/reskin/test_judge_screenshot.py with 8 tests:
+- test_build_prompt_single_image, test_build_prompt_with_reference,
+  test_build_prompt_with_criteria, test_build_prompt_with_reference_and_criteria,
+  test_parse_rating_valid, test_parse_rating_missing,
+  test_parse_rating_ignores_out_of_range, test_parse_rating_picks_first_match
+Verification passed: pytest scripts/reskin/test_judge_screenshot.py -v (8/8 passed).
+Status: PASSED

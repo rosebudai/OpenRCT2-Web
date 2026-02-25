@@ -19,3 +19,12 @@ Each has tiling (bool), style_prompt (str), description_hint (str). No sprite ID
 Verification passed: import + assert len(CATEGORIES) == 6.
 Status: PASSED
 Status: PASSED
+
+--- Iteration 2 | story-2 | 2026-02-25 00:11:09 ---
+Created scripts/reskin/batch_sprites.py adapted from ottd-reskin-pipeline/batch_env.py.
+Key changes: removed NFO parsing, sprite ID extraction, subcategory batching.
+Functions: load_sprites, create_batches, render_grid, render_grid_with_sprites, batch_sprites, main CLI.
+Created scripts/reskin/test_batch_sprites.py with 6 tests — all pass.
+Verification passed: pytest scripts/reskin/test_batch_sprites.py -v (6/6 passed).
+Status: PASSED
+Status: PASSED

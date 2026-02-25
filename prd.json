@@ -33,7 +33,7 @@
       "title": "parse_restyled.py — sprite extraction with tests",
       "description": "Create scripts/reskin/parse_restyled.py adapted from /workspace/ottd-reskin-pipeline/parse_and_replace.py. Remove patch_sprite_sheets(), rebuild_grf(), save_png_small_idat(). Keep: extract_sprites_from_grid(), restore_alpha(), blend_tile_edges(), validate_sprite(). Add parse_restyled() main entry point that writes individual PNGs to output_dir. CLI: --manifest, --sprites-dir, --restyled-dir, --output-dir, --tiling, --no-tiling, --dry-run. Also create scripts/reskin/test_parse_restyled.py with 7 tests: test_restore_alpha, test_restore_alpha_transparent_original, test_blend_tile_edges, test_blend_tile_edges_tiny_sprite, test_validate_sprite_different, test_validate_sprite_too_similar, test_validate_sprite_transparent. See docs/plans/2026-02-25-reskin-pipeline.md Task 4 for exact code.",
       "verify": "cd /workspace/OpenRCT2-Web && python3 -m pytest scripts/reskin/test_parse_restyled.py -v",
-      "status": "pending",
+      "status": "passed",
       "retries": 0
     },
     {

@@ -37,3 +37,13 @@ Created scripts/reskin/test_generate_restyled.py with 4 tests — all pass.
 Verification passed: pytest scripts/reskin/test_generate_restyled.py -v (4/4 passed).
 Status: PASSED
 Status: PASSED
+
+--- Iteration 4 | story-4 | 2026-02-25 00:14:28 ---
+Created scripts/reskin/parse_restyled.py adapted from ottd-reskin-pipeline/parse_and_replace.py.
+Removed patch_sprite_sheets(), rebuild_grf(), save_png_small_idat(). Kept extract_sprites_from_grid(),
+restore_alpha(), blend_tile_edges(), validate_sprite(). Added parse_restyled() main entry point.
+Key change: returns (original_filename, ...) instead of (sprite_id, ...) since OpenRCT2 uses filenames.
+Created scripts/reskin/test_parse_restyled.py with 7 tests — all pass.
+Verification passed: pytest scripts/reskin/test_parse_restyled.py -v (7/7 passed).
+Status: PASSED
+Status: PASSED

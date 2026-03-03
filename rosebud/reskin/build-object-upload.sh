@@ -105,8 +105,8 @@ if [[ "$rebuild" -eq 1 && -n "$cli_cmd" && ! -x "$cli_cmd" ]]; then
 fi
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-overlay_builder="$repo_root/tools/reskin/create-overlay.sh"
-upload_builder="$repo_root/tools/reskin/build-upload.sh"
+overlay_builder="$repo_root/rosebud/reskin/create-overlay.sh"
+upload_builder="$repo_root/rosebud/reskin/build-upload.sh"
 
 if [[ ! -x "$overlay_builder" ]]; then
     echo "Missing executable script: $overlay_builder" >&2

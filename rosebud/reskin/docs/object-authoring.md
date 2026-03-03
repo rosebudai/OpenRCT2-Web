@@ -11,7 +11,7 @@ This guide uses scripts in this repo to create editable object workspaces from a
 ## 1) Initialize an editable workspace
 
 ```bash
-tools/reskin/init-workspace.sh \
+rosebud/reskin/init-workspace.sh \
   /Users/meiliu/Downloads/openrct2-upload.zip \
   object/official/scenery_small/official.scenery_small.support_structure_half.parkobj \
   /Users/meiliu/git/rosebud/OpenRCT2-Web/reskin-workbench/support-structure-half
@@ -48,7 +48,7 @@ Outputs:
 ## 4) Build a patched upload zip
 
 ```bash
-tools/reskin/build-object-upload.sh \
+rosebud/reskin/build-object-upload.sh \
   --rebuild \
   /Users/meiliu/Downloads/openrct2-upload.zip \
   /tmp/openrct2-upload-reskinned.zip \
@@ -58,7 +58,7 @@ tools/reskin/build-object-upload.sh \
 This command rebuilds the workspace artifact, maps it to the original object path from `object-path-in-assets-zip.txt`, and writes a patched upload zip.
 
 For additional options and multi-object packaging, see:
-`tools/reskin/docs/pipeline.md`
+`rosebud/reskin/docs/pipeline.md`
 
 ## Notes
 

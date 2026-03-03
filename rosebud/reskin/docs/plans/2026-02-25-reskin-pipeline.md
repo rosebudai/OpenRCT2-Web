@@ -4,7 +4,7 @@
 
 **Goal:** Add AI-powered sprite reskinning scripts that batch OpenRCT2 sprite PNGs into grids, send them to FAL.ai for restyling, and extract the results back — integrating with the existing workspace/overlay/upload pipeline.
 
-**Architecture:** Five Python scripts under `tools/reskin/`. The core pipeline is game-agnostic (batch PNGs into grids, call FAL.ai, extract results). An orchestrator script (`reskin.py`) provides both workspace mode (integrates with `init-reskin-object-workspace.sh` outputs) and standalone mode (any directory of PNGs). Category presets in `categories.py` provide reusable style configs.
+**Architecture:** Five Python scripts under `rosebud/reskin/`. The core pipeline is game-agnostic (batch PNGs into grids, call FAL.ai, extract results). An orchestrator script (`reskin.py`) provides both workspace mode (integrates with `init-reskin-object-workspace.sh` outputs) and standalone mode (any directory of PNGs). Category presets in `categories.py` provide reusable style configs.
 
 **Tech Stack:** Python 3.8+, Pillow, numpy, fal-client. FAL.ai Gemini 3 Pro image-edit API.
 
@@ -16,18 +16,18 @@ The source code being adapted lives at `/workspace/ottd-reskin-pipeline/`. Key f
 
 | ottd file | Becomes | What changes |
 |-----------|---------|--------------|
-| `batch_env.py` | `tools/reskin/batch_sprites.py` | Remove NFO parsing. Input is just a PNG directory. No sprite ID ranges — discover files from disk. |
-| `generate_restyled.py` | `tools/reskin/generate_restyled.py` | Nearly identical. Update default paths. Keep FAL.ai logic as-is. |
-| `parse_and_replace.py` | `tools/reskin/parse_restyled.py` | Remove GRF rebuild / sheet patching. Output is restyled PNGs to a target dir. Keep alpha restore + edge blending. |
-| `restyle_env.py` | `tools/reskin/reskin.py` | Replace subprocess calls with direct function imports. Add `--workspace` mode. |
-| `env_categories.py` | `tools/reskin/categories.py` | Replace zBase sprite ID ranges with OpenRCT2 style presets (scenery, terrain, rides). No ID ranges needed. |
+| `batch_env.py` | `rosebud/reskin/batch_sprites.py` | Remove NFO parsing. Input is just a PNG directory. No sprite ID ranges — discover files from disk. |
+| `generate_restyled.py` | `rosebud/reskin/generate_restyled.py` | Nearly identical. Update default paths. Keep FAL.ai logic as-is. |
+| `parse_and_replace.py` | `rosebud/reskin/parse_restyled.py` | Remove GRF rebuild / sheet patching. Output is restyled PNGs to a target dir. Keep alpha restore + edge blending. |
+| `restyle_env.py` | `rosebud/reskin/reskin.py` | Replace subprocess calls with direct function imports. Add `--workspace` mode. |
+| `env_categories.py` | `rosebud/reskin/categories.py` | Replace zBase sprite ID ranges with OpenRCT2 style presets (scenery, terrain, rides). No ID ranges needed. |
 
 ## Reference: existing OpenRCT2-Web reskin scripts
 
-- `tools/reskin/init-workspace.sh` — creates `<workspace>/sprites/` with exported PNGs + `sprites.json`
+- `rosebud/reskin/init-workspace.sh` — creates `<workspace>/sprites/` with exported PNGs + `sprites.json`
 - `<workspace>/rebuild-object.sh` — rebuilds `images.dat` + `reskinned.parkobj` from sprites
-- `tools/reskin/create-overlay.sh` — maps workspaces into overlay dirs
-- `tools/reskin/build-upload.sh` — merges overlays into web upload zip
+- `rosebud/reskin/create-overlay.sh` — maps workspaces into overlay dirs
+- `rosebud/reskin/build-upload.sh` — merges overlays into web upload zip
 
 The new Python pipeline slots in between steps 1 and the rebuild: it reads from `sprites/`, writes restyled PNGs back there (or to a separate output dir).
 
@@ -36,7 +36,7 @@ The new Python pipeline slots in between steps 1 and the rebuild: it reads from 
 ### Task 1: `categories.py` — Style preset definitions
 
 **Files:**
-- Create: `tools/reskin/categories.py`
+- Create: `rosebud/reskin/categories.py`
 
 **Step 1: Create the categories module**
 
@@ -108,7 +108,7 @@ CATEGORIES = {
 
 **Step 2: Verify it imports cleanly**
 
-Run: `python3 -c "import sys; sys.path.insert(0, 'tools/reskin'); from categories import CATEGORIES; print(f'{len(CATEGORIES)} categories loaded')" `
+Run: `python3 -c "import sys; sys.path.insert(0, 'rosebud/reskin'); from categories import CATEGORIES; print(f'{len(CATEGORIES)} categories loaded')" `
 Expected: `6 categories loaded`
 
 **Step 3: Commit**
@@ -122,7 +122,7 @@ Expected: `6 categories loaded`
 ### Task 2: `batch_sprites.py` — Grid batching
 
 **Files:**
-- Create: `tools/reskin/batch_sprites.py`
+- Create: `rosebud/reskin/batch_sprites.py`
 
 This is adapted from `/workspace/ottd-reskin-pipeline/batch_env.py`. Key changes:
 - No NFO parsing — sprites come from a flat PNG directory
@@ -373,7 +373,7 @@ if __name__ == "__main__":
 
 **Step 2: Write a smoke test**
 
-Create `tools/reskin/test_batch_sprites.py`:
+Create `rosebud/reskin/test_batch_sprites.py`:
 
 ```python
 """Smoke tests for batch_sprites.py."""
@@ -474,7 +474,7 @@ def test_batch_sprites_end_to_end():
 
 **Step 3: Run tests**
 
-Run: `cd /workspace/OpenRCT2-Web && python3 -m pytest tools/reskin/test_batch_sprites.py -v`
+Run: `cd /workspace/OpenRCT2-Web && python3 -m pytest rosebud/reskin/test_batch_sprites.py -v`
 Expected: All 6 tests PASS.
 
 **Step 4: Commit**
@@ -488,7 +488,7 @@ Expected: All 6 tests PASS.
 ### Task 3: `generate_restyled.py` — FAL.ai generation
 
 **Files:**
-- Create: `tools/reskin/generate_restyled.py`
+- Create: `rosebud/reskin/generate_restyled.py`
 
 Adapted from `/workspace/ottd-reskin-pipeline/generate_restyled.py`. Changes:
 - Update default paths to match our directory layout
@@ -724,7 +724,7 @@ if __name__ == "__main__":
 
 **Step 2: Write tests for the non-API functions**
 
-Add to `tools/reskin/test_generate_restyled.py`:
+Add to `rosebud/reskin/test_generate_restyled.py`:
 
 ```python
 """Tests for generate_restyled.py (non-API functions only)."""
@@ -787,7 +787,7 @@ def test_load_descriptions_missing_file():
 
 **Step 3: Run tests**
 
-Run: `cd /workspace/OpenRCT2-Web && python3 -m pytest tools/reskin/test_generate_restyled.py -v`
+Run: `cd /workspace/OpenRCT2-Web && python3 -m pytest rosebud/reskin/test_generate_restyled.py -v`
 Expected: All 4 tests PASS.
 
 **Step 4: Commit**
@@ -801,7 +801,7 @@ Expected: All 4 tests PASS.
 ### Task 4: `parse_restyled.py` — Extract and restore sprites
 
 **Files:**
-- Create: `tools/reskin/parse_restyled.py`
+- Create: `rosebud/reskin/parse_restyled.py`
 
 Adapted from `/workspace/ottd-reskin-pipeline/parse_and_replace.py`. Changes:
 - Remove `patch_sprite_sheets()` and `rebuild_grf()` — not needed for OpenRCT2
@@ -1091,7 +1091,7 @@ if __name__ == "__main__":
 
 **Step 2: Write tests**
 
-Create `tools/reskin/test_parse_restyled.py`:
+Create `rosebud/reskin/test_parse_restyled.py`:
 
 ```python
 """Tests for parse_restyled.py."""
@@ -1203,7 +1203,7 @@ def test_validate_sprite_transparent():
 
 **Step 3: Run tests**
 
-Run: `cd /workspace/OpenRCT2-Web && python3 -m pytest tools/reskin/test_parse_restyled.py -v`
+Run: `cd /workspace/OpenRCT2-Web && python3 -m pytest rosebud/reskin/test_parse_restyled.py -v`
 Expected: All 7 tests PASS.
 
 **Step 4: Commit**
@@ -1217,7 +1217,7 @@ Expected: All 7 tests PASS.
 ### Task 5: `reskin.py` — Orchestrator
 
 **Files:**
-- Create: `tools/reskin/reskin.py`
+- Create: `rosebud/reskin/reskin.py`
 
 This chains batch -> generate -> parse and supports both workspace mode and standalone mode.
 
@@ -1478,7 +1478,7 @@ if __name__ == "__main__":
 
 **Step 2: Write tests**
 
-Create `tools/reskin/test_reskin.py`:
+Create `rosebud/reskin/test_reskin.py`:
 
 ```python
 """Tests for reskin.py orchestrator."""
@@ -1547,7 +1547,7 @@ def test_resolve_tiling_from_category():
 
 **Step 3: Run tests**
 
-Run: `cd /workspace/OpenRCT2-Web && python3 -m pytest tools/reskin/test_reskin.py -v`
+Run: `cd /workspace/OpenRCT2-Web && python3 -m pytest rosebud/reskin/test_reskin.py -v`
 Expected: All 6 tests PASS.
 
 **Step 4: Commit**
@@ -1562,22 +1562,22 @@ Expected: All 6 tests PASS.
 
 **Step 1: Run all tests together**
 
-Run: `cd /workspace/OpenRCT2-Web && python3 -m pytest tools/reskin/ -v`
+Run: `cd /workspace/OpenRCT2-Web && python3 -m pytest rosebud/reskin/ -v`
 Expected: All tests pass (6 + 4 + 7 + 6 = 23 tests).
 
 **Step 2: Verify CLI help works**
 
 Run these four commands and verify each prints usage/help:
 ```bash
-python3 tools/reskin/batch_sprites.py --help
-python3 tools/reskin/generate_restyled.py --help
-python3 tools/reskin/parse_restyled.py --help
-python3 tools/reskin/reskin.py --help
+python3 rosebud/reskin/batch_sprites.py --help
+python3 rosebud/reskin/generate_restyled.py --help
+python3 rosebud/reskin/parse_restyled.py --help
+python3 rosebud/reskin/reskin.py --help
 ```
 
 **Step 3: Verify category listing**
 
-Run: `python3 tools/reskin/reskin.py --list-categories`
+Run: `python3 rosebud/reskin/reskin.py --list-categories`
 Expected: Lists 6 categories with tiling flags.
 
 **Step 4: Final commit with all files**

@@ -21,7 +21,7 @@ objectsversion
 # Port-specific ignores
 tmp/
 build-native/
-emscripten/docker/ext/
+rosebud/docker/ext/
 .claude/specs/
 
 #lib

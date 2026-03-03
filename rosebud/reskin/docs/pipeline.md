@@ -4,9 +4,9 @@ This pipeline packages object reskins into a playable OpenRCT2 web upload zip.
 
 It is built from these scripts:
 
-- `tools/reskin/init-workspace.sh`
-- `tools/reskin/build-object-upload.sh`
-- `tools/reskin/build-upload.sh`
+- `rosebud/reskin/init-workspace.sh`
+- `rosebud/reskin/build-object-upload.sh`
+- `rosebud/reskin/build-upload.sh`
 
 ## Prerequisites
 
@@ -17,7 +17,7 @@ It is built from these scripts:
 ## 1) Initialize one or more workspaces
 
 ```bash
-tools/reskin/init-workspace.sh \
+rosebud/reskin/init-workspace.sh \
   /Users/meiliu/Downloads/openrct2-upload.zip \
   object/official/scenery_small/official.scenery_small.support_structure_half.parkobj \
   ./reskin-workbench/support-structure-half
@@ -34,7 +34,7 @@ Edit PNGs under each workspace `sprites/` directory.
 For one workspace:
 
 ```bash
-tools/reskin/build-object-upload.sh \
+rosebud/reskin/build-object-upload.sh \
   --rebuild \
   /Users/meiliu/Downloads/openrct2-upload.zip \
   /tmp/openrct2-upload-reskinned.zip \
@@ -44,7 +44,7 @@ tools/reskin/build-object-upload.sh \
 For multiple workspaces:
 
 ```bash
-tools/reskin/build-object-upload.sh \
+rosebud/reskin/build-object-upload.sh \
   --rebuild \
   /Users/meiliu/Downloads/openrct2-upload.zip \
   /tmp/openrct2-upload-reskinned.zip \
@@ -57,7 +57,7 @@ If you already rebuilt the workspace artifacts, omit `--rebuild`.
 ## Optional: Keep the generated overlay for inspection
 
 ```bash
-tools/reskin/build-object-upload.sh \
+rosebud/reskin/build-object-upload.sh \
   --rebuild \
   --overlay-dir /tmp/reskin-overlay \
   /Users/meiliu/Downloads/openrct2-upload.zip \
@@ -68,7 +68,7 @@ tools/reskin/build-object-upload.sh \
 ## Optional: Use a custom `openrct2-cli` command
 
 ```bash
-tools/reskin/build-object-upload.sh \
+rosebud/reskin/build-object-upload.sh \
   --rebuild \
   --cli-cmd ./scripts/openrct2-cli-docker.sh \
   /Users/meiliu/Downloads/openrct2-upload.zip \

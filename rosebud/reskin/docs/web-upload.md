@@ -8,13 +8,13 @@ This repo's web package is typically distributed as:
 - `assets/rct2-content.zip`
 - `assets/openrct2.zip`
 
-Use `tools/reskin/build-upload.sh` to apply your own files on top of an existing upload zip.
+Use `rosebud/reskin/build-upload.sh` to apply your own files on top of an existing upload zip.
 
 If your inputs come from initialized object workspaces (`reskin-workbench/...`), prefer:
-`tools/reskin/build-object-upload.sh` (see `tools/reskin/docs/pipeline.md`).
+`rosebud/reskin/build-object-upload.sh` (see `rosebud/reskin/docs/pipeline.md`).
 
 For creating/editing object sprite files first, see:
-`tools/reskin/docs/object-authoring.md`
+`rosebud/reskin/docs/object-authoring.md`
 
 ## Overlay Structure
 
@@ -30,7 +30,7 @@ Only include files you want to replace or add.
 ## Command
 
 ```bash
-tools/reskin/build-upload.sh \
+rosebud/reskin/build-upload.sh \
   /path/to/openrct2-upload.zip \
   /path/to/overlay \
   /tmp/openrct2-upload-reskinned.zip

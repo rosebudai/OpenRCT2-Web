@@ -11,11 +11,11 @@ The existing OpenRCT2-Web reskin workflow requires manual sprite editing. The ot
     OR
 Arbitrary sprite PNG directories
     |
-tools/reskin/batch_sprites.py       <- generic: creates 4x4 grids + manifest.json
+rosebud/reskin/batch_sprites.py       <- generic: creates 4x4 grids + manifest.json
     |
-tools/reskin/generate_restyled.py   <- generic: sends grids to FAL.ai Gemini 3 Pro
+rosebud/reskin/generate_restyled.py   <- generic: sends grids to FAL.ai Gemini 3 Pro
     |
-tools/reskin/parse_restyled.py      <- generic: extracts sprites, restores alpha, blends edges
+rosebud/reskin/parse_restyled.py      <- generic: extracts sprites, restores alpha, blends edges
     |
 Restyled PNGs back in workspace sprites/ dir
     |
@@ -26,11 +26,11 @@ rebuild-object.sh -> create-reskin-overlay.sh -> build-reskin-upload.sh  (existi
 
 | File | Role |
 |------|------|
-| `tools/reskin/categories.py` | Category configs: style prompts, tiling flags, description hints. Starts with scenery presets, extensible. |
-| `tools/reskin/batch_sprites.py` | Scans a sprite directory, groups by size into 4x4 grids (2048x2048), writes manifest.json. Game-agnostic. |
-| `tools/reskin/generate_restyled.py` | Reads manifest, sends each grid to FAL.ai Gemini 3 Pro, saves restyled grids. |
-| `tools/reskin/parse_restyled.py` | Extracts sprites from AI grids using manifest coordinates, restores original alpha masks, blends tile edges. |
-| `tools/reskin/reskin.py` | Orchestrator: chains batch -> generate -> parse. Supports `--step` and `--through`. |
+| `rosebud/reskin/categories.py` | Category configs: style prompts, tiling flags, description hints. Starts with scenery presets, extensible. |
+| `rosebud/reskin/batch_sprites.py` | Scans a sprite directory, groups by size into 4x4 grids (2048x2048), writes manifest.json. Game-agnostic. |
+| `rosebud/reskin/generate_restyled.py` | Reads manifest, sends each grid to FAL.ai Gemini 3 Pro, saves restyled grids. |
+| `rosebud/reskin/parse_restyled.py` | Extracts sprites from AI grids using manifest coordinates, restores original alpha masks, blends tile edges. |
+| `rosebud/reskin/reskin.py` | Orchestrator: chains batch -> generate -> parse. Supports `--step` and `--through`. |
 
 ## Adaptations from ottd pipeline
 
@@ -55,32 +55,32 @@ rebuild-object.sh -> create-reskin-overlay.sh -> build-reskin-upload.sh  (existi
 
 ```bash
 # 1. Init workspace (existing)
-tools/reskin/init-workspace.sh \
+rosebud/reskin/init-workspace.sh \
   upload.zip \
   object/official/scenery_small/official.scenery_small.support_structure_half.parkobj \
   ./reskin-workbench/support-structure
 
 # 2. AI reskin (NEW)
-python3 tools/reskin/reskin.py \
+python3 rosebud/reskin/reskin.py \
   --workspace ./reskin-workbench/support-structure \
   --style "Cartoony hand-painted fantasy. Bold outlines, vibrant colors." \
   --through generate
 
 # 3. Review, then apply
-python3 tools/reskin/reskin.py \
+python3 rosebud/reskin/reskin.py \
   --workspace ./reskin-workbench/support-structure \
   --step parse
 
 # 4. Rebuild + package (existing)
 ./reskin-workbench/support-structure/rebuild-object.sh
-tools/reskin/build-object-upload.sh \
+rosebud/reskin/build-object-upload.sh \
   upload.zip /tmp/reskinned.zip ./reskin-workbench/support-structure
 ```
 
 ### Standalone mode (any PNGs)
 
 ```bash
-python3 tools/reskin/reskin.py \
+python3 rosebud/reskin/reskin.py \
   --sprites-dir ./my-sprites/ \
   --style "Pixel art, 16-bit SNES style" \
   --tiling

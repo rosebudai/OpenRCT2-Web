@@ -16,6 +16,7 @@
 #include "WindowManager.h"
 #include "drawing/engines/DrawingEngineFactory.hpp"
 #include "input/ShortcutManager.h"
+#include "input/TouchGestureManager.h"
 #include "interface/InGameConsole.h"
 #include "interface/Theme.h"
 #include "interface/Viewport.h"
@@ -68,8 +69,6 @@ using namespace OpenRCT2::Ui;
 class UiContext final : public IUiContext
 {
 private:
-    constexpr static uint32_t kTouchDoubleTimeout = 300;
-
     const std::unique_ptr<IPlatformUiContext> _platformUiContext;
     const std::unique_ptr<IWindowManager> _windowManager;
 
@@ -92,8 +91,7 @@ private:
     uint32_t _lastKeyPressed = 0;
     const uint8_t* _keysState = nullptr;
     uint8_t _keysPressed[256] = {};
-    uint32_t _lastGestureTimestamp = 0;
-    float _gestureRadius = 0;
+    TouchGestureManager _touchGestureManager;
 
     InGameConsole _inGameConsole;
     std::unique_ptr<ITitleSequencePlayer> _titleSequencePlayer;
@@ -118,6 +116,7 @@ public:
         : _platformUiContext(CreatePlatformUiContext())
         , _windowManager(CreateWindowManager())
         , _shortcutManager(env)
+        , _touchGestureManager(&_cursorState)
     {
         LogSDLVersion();
         if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0)
@@ -480,55 +479,15 @@ public:
                 }
                 // Apple sends touchscreen events for trackpads, so ignore these events on macOS
 #ifndef __MACOSX__
-                case SDL_FINGERMOTION:
-                    _cursorState.position = { static_cast<int32_t>(e.tfinger.x * _width),
-                                              static_cast<int32_t>(e.tfinger.y * _height) };
-                    break;
                 case SDL_FINGERDOWN:
-                {
-                    ScreenCoordsXY fingerPos = { static_cast<int32_t>(e.tfinger.x * _width),
-                                                 static_cast<int32_t>(e.tfinger.y * _height) };
-
-                    _cursorState.touchIsDouble
-                        = (!_cursorState.touchIsDouble
-                           && e.tfinger.timestamp - _cursorState.touchDownTimestamp < kTouchDoubleTimeout);
-
-                    if (_cursorState.touchIsDouble)
-                    {
-                        StoreMouseInput(MouseState::rightPress, fingerPos);
-                        _cursorState.right = CURSOR_PRESSED;
-                        _cursorState.old = 2;
-                    }
-                    else
-                    {
-                        StoreMouseInput(MouseState::leftPress, fingerPos);
-                        _cursorState.left = CURSOR_PRESSED;
-                        _cursorState.old = 1;
-                    }
-                    _cursorState.touch = true;
-                    _cursorState.touchDownTimestamp = e.tfinger.timestamp;
+                    _touchGestureManager.HandleFingerDown(e.tfinger);
                     break;
-                }
                 case SDL_FINGERUP:
-                {
-                    ScreenCoordsXY fingerPos = { static_cast<int32_t>(e.tfinger.x * _width),
-                                                 static_cast<int32_t>(e.tfinger.y * _height) };
-
-                    if (_cursorState.touchIsDouble)
-                    {
-                        StoreMouseInput(MouseState::rightRelease, fingerPos);
-                        _cursorState.right = CURSOR_RELEASED;
-                        _cursorState.old = 4;
-                    }
-                    else
-                    {
-                        StoreMouseInput(MouseState::leftRelease, fingerPos);
-                        _cursorState.left = CURSOR_RELEASED;
-                        _cursorState.old = 3;
-                    }
-                    _cursorState.touch = true;
+                    _touchGestureManager.HandleFingerUp(e.tfinger);
                     break;
-                }
+                case SDL_FINGERMOTION:
+                    _touchGestureManager.HandleFingerMotion(e.tfinger);
+                    break;
 #endif
                 case SDL_KEYDOWN:
                 {
@@ -555,24 +514,7 @@ public:
                     break;
                 }
                 case SDL_MULTIGESTURE:
-                    if (e.mgesture.numFingers == 2)
-                    {
-                        if (e.mgesture.timestamp > _lastGestureTimestamp + 1000)
-                        {
-                            _gestureRadius = 0;
-                        }
-                        _lastGestureTimestamp = e.mgesture.timestamp;
-                        _gestureRadius += e.mgesture.dDist;
-
-                        // Zoom gesture
-                        constexpr int32_t tolerance = 128;
-                        int32_t gesturePixels = static_cast<int32_t>(_gestureRadius * _width);
-                        if (abs(gesturePixels) > tolerance)
-                        {
-                            _gestureRadius = 0;
-                            Windows::MainWindowZoom(gesturePixels > 0, true);
-                        }
-                    }
+                    // Handled by TouchGestureManager via individual finger events
                     break;
                 case SDL_TEXTEDITING:
                     _textComposition.HandleMessage(&e);
@@ -587,6 +529,9 @@ public:
                 }
             }
         }
+
+        // Check for long-press timeout after processing all events
+        _touchGestureManager.Update(SDL_GetTicks());
 
         _cursorState.any = _cursorState.left | _cursorState.middle | _cursorState.right;
 
@@ -845,6 +790,7 @@ private:
         // Scale the native window size to the game's canvas size
         _width = static_cast<int32_t>(width / Config::Get().general.windowScale);
         _height = static_cast<int32_t>(height / Config::Get().general.windowScale);
+        _touchGestureManager.SetScreenSize(_width, _height);
 
         DrawingEngineResize();
 

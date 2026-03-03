@@ -14,7 +14,7 @@ Each workspace must contain:
   - object-path-in-assets-zip.txt
   - reskinned.parkobj (for .parkobj targets) OR object.json (for .json targets)
 
-The generated overlay can be consumed by scripts/build-reskin-upload.sh.
+The generated overlay can be consumed by tools/reskin/build-upload.sh.
 EOF
 }
 
@@ -43,7 +43,7 @@ for workspace_dir in "$@"; do
     object_path_file="$workspace_dir/object-path-in-assets-zip.txt"
     if [[ ! -f "$object_path_file" ]]; then
         echo "Missing workspace metadata file: $object_path_file" >&2
-        echo "Re-run scripts/init-reskin-object-workspace.sh for this workspace." >&2
+        echo "Re-run tools/reskin/init-workspace.sh for this workspace." >&2
         exit 1
     fi
 

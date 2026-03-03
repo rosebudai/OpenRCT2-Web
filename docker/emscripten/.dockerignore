@@ -1,0 +1,7 @@
+# Exclude .git dirs from deps to reduce context size
+ext/*/.git
+ext/icu/icu4j
+ext/icu/tools
+ext/icu/testdata
+ext/icu/docs
+ext/icu/.github

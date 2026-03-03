@@ -1,0 +1,78 @@
+#!/bin/bash
+# Build OpenRCT2 for Emscripten/WASM using the Docker build image.
+#
+# Handles Docker-in-Docker (DinD) environments where host bind mounts
+# don't work because the Docker daemon doesn't see the container's
+# filesystem. Uses a named volume + docker cp as a robust workaround.
+#
+# Usage: scripts/docker-build-emscripten [--rebuild-image]
+#
+# Options:
+#   --rebuild-image   Force rebuild the Docker image (otherwise uses cache)
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+IMAGE_NAME="openrct2-emscripten-local"
+CONTAINER_NAME="orct2-wasm-build"
+VOLUME_NAME="orct2-wasm-src"
+
+# --- Parse args ---
+REBUILD_IMAGE=false
+for arg in "$@"; do
+    case $arg in
+        --rebuild-image) REBUILD_IMAGE=true ;;
+        *) echo "Unknown option: $arg"; exit 1 ;;
+    esac
+done
+
+# --- Build image if needed ---
+if [ "$REBUILD_IMAGE" = true ] || ! docker image inspect "$IMAGE_NAME" >/dev/null 2>&1; then
+    echo "==> Building Docker image ($IMAGE_NAME) for $(uname -m)..."
+    docker build -t "$IMAGE_NAME" "$REPO_DIR/docker/emscripten/"
+else
+    echo "==> Using cached Docker image ($IMAGE_NAME)"
+fi
+
+# --- Clean up any previous run ---
+docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
+docker volume rm "$VOLUME_NAME" 2>/dev/null || true
+
+# --- Create volume and container ---
+echo "==> Creating build volume and container..."
+docker volume create "$VOLUME_NAME" >/dev/null
+docker create --name "$CONTAINER_NAME" \
+    -v "$VOLUME_NAME":/src \
+    "$IMAGE_NAME" \
+    bash -c "cd /src && . scripts/setenv && build-emscripten"
+
+# --- Sync source into volume ---
+echo "==> Syncing source into volume (this may take a moment)..."
+# Use tar to efficiently copy, respecting .gitignore-like patterns
+cd "$REPO_DIR"
+# Exclude build artifacts, .git, and large irrelevant dirs
+tar cf - \
+    --exclude='./build' \
+    --exclude='./build_native' \
+    --exclude='./.git' \
+    --exclude='./node_modules' \
+    --exclude='./.claude' \
+    . | docker cp - "$CONTAINER_NAME":/src/
+
+# --- Build ---
+echo "==> Starting WASM build..."
+docker start -a "$CONTAINER_NAME"
+
+# --- Copy output back ---
+echo "==> Copying build output..."
+mkdir -p "$REPO_DIR/build/www"
+docker cp "$CONTAINER_NAME":/src/build/www/. "$REPO_DIR/build/www/"
+
+# --- Clean up ---
+echo "==> Cleaning up..."
+docker rm -f "$CONTAINER_NAME" >/dev/null
+docker volume rm "$VOLUME_NAME" >/dev/null
+
+echo "==> Build complete! Output in build/www/"
+echo "    Serve with: python3 scripts/serve-emscripten.py"

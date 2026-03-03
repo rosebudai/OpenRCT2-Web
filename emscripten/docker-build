@@ -5,7 +5,7 @@
 # don't work because the Docker daemon doesn't see the container's
 # filesystem. Uses a named volume + docker cp as a robust workaround.
 #
-# Usage: scripts/docker-build-emscripten [--rebuild-image]
+# Usage: emscripten/docker-build [--rebuild-image]
 #
 # Options:
 #   --rebuild-image   Force rebuild the Docker image (otherwise uses cache)
@@ -30,7 +30,7 @@ done
 # --- Build image if needed ---
 if [ "$REBUILD_IMAGE" = true ] || ! docker image inspect "$IMAGE_NAME" >/dev/null 2>&1; then
     echo "==> Building Docker image ($IMAGE_NAME) for $(uname -m)..."
-    docker build -t "$IMAGE_NAME" "$REPO_DIR/docker/emscripten/"
+    docker build -t "$IMAGE_NAME" "$REPO_DIR/emscripten/docker/"
 else
     echo "==> Using cached Docker image ($IMAGE_NAME)"
 fi
@@ -75,4 +75,4 @@ docker rm -f "$CONTAINER_NAME" >/dev/null
 docker volume rm "$VOLUME_NAME" >/dev/null
 
 echo "==> Build complete! Output in build/www/"
-echo "    Serve with: python3 scripts/serve-emscripten.py"
+echo "    Serve with: python3 emscripten/serve.py"

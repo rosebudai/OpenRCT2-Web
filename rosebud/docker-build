@@ -69,6 +69,12 @@ echo "==> Copying build output..."
 mkdir -p "$REPO_DIR/build/www"
 docker cp "$CONTAINER_NAME":/src/build/www/. "$REPO_DIR/build/www/"
 
+# --- Overlay rosebud static files ---
+if [ -d "$REPO_DIR/rosebud/static" ]; then
+    echo "==> Overlaying rosebud/static/ onto build output..."
+    cp -r "$REPO_DIR/rosebud/static/"* "$REPO_DIR/build/www/"
+fi
+
 # --- Clean up ---
 echo "==> Cleaning up..."
 docker rm -f "$CONTAINER_NAME" >/dev/null

@@ -18,6 +18,11 @@ sequencesversion
 objectsversion
 /out/
 
+# Port-specific ignores
+tmp/
+build-native/
+docker/emscripten/ext/
+
 #lib
 lib
 libversion

@@ -9,10 +9,14 @@ Usage:
 
 Description:
   Creates a no-music variant of an OpenRCT2 web upload package by stripping:
-  - RCT2 legacy music payloads from assets/rct2-content.zip (Data/css*.dat)
-  - OpenRCT2 music payloads from assets/assets.zip:
+  - RCT2 legacy music payloads from rct2-content.zip (Data/css*.dat)
+  - OpenRCT2 music payloads from assets.zip:
       - assetpack/openrct2.music.*.parkap
       - object/official/music/*
+
+  The input zip layout:
+    index.html, index.js (root — become GenericFiles)
+    assets/openrct2.zip, assets/assets.zip, assets/rct2-content.zip (become Assets)
 
 Examples:
   build-no-music-upload.sh /path/to/openrct2-upload.zip
@@ -87,8 +91,8 @@ fi
     LC_ALL=C find . -type f | sed 's#^\./##' | sort | zip -q -X "$output_zip" -@
 )
 
-input_bytes="$(stat -f%z "$input_zip")"
-output_bytes="$(stat -f%z "$output_zip")"
+input_bytes="$(stat -c%s "$input_zip" 2>/dev/null || stat -f%z "$input_zip")"
+output_bytes="$(stat -c%s "$output_zip" 2>/dev/null || stat -f%z "$output_zip")"
 delta_bytes="$((input_bytes - output_bytes))"
 
 echo
